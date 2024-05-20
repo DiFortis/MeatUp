@@ -1,47 +1,55 @@
 package com.example.meatup
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.*
+import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.MeatUpTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        auth = Firebase.auth
+
         setContent {
             MeatUpTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                var authState by remember { mutableStateOf(AuthState.LOGIN) }
+                val currentUser = remember { mutableStateOf(auth.currentUser) }
+
+                if (currentUser.value != null) {
+                    ProfileScreen(
+                        userEmail = currentUser.value!!.email ?: "",
+                        onLogout = {
+                            auth.signOut()
+                            currentUser.value = null
+                            authState = AuthState.LOGIN
+                        }
                     )
+                } else {
+                    when (authState) {
+                        AuthState.LOGIN -> LoginScreen(
+                            onLoginSuccess = { user -> currentUser.value = user },
+                            onRegisterClick = { authState = AuthState.REGISTER }
+                        )
+                        AuthState.REGISTER -> RegisterScreen(
+                            onRegisterSuccess = { user -> currentUser.value = user },
+                            onLoginClick = { authState = AuthState.LOGIN }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MeatUpTheme {
-        Greeting("Android")
-    }
+enum class AuthState {
+    LOGIN, REGISTER
 }
