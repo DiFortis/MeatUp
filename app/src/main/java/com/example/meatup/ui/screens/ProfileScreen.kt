@@ -1,6 +1,5 @@
 package com.example.meatup.ui.screens
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -9,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileScreen(userEmail: String, onLogout: () -> Unit) {
+fun ProfileScreen(userEmail: String, onLogout: () -> Unit, onEditDetails: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -24,6 +23,13 @@ fun ProfileScreen(userEmail: String, onLogout: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Logout")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = onEditDetails,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Edit Details")
         }
     }
 }
