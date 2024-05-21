@@ -22,13 +22,17 @@ class MainActivity : ComponentActivity() {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
                 val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
+                val previousState = remember { mutableStateOf<AuthState?>(null) }
 
                 if (currentUser.value != null) {
                     when (authState) {
-                        AuthState.USER_DETAILS -> UserDetailsScreen { firstName, lastName, phoneNumber, country ->
-                            userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
-                            authState = AuthState.PROFILE
-                        }
+                        AuthState.USER_DETAILS -> UserDetailsScreen(
+                            onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
+                                userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
+                                authState = AuthState.PROFILE
+                            },
+
+                        )
                         AuthState.PROFILE -> ProfileScreen(
                             userEmail = currentUser.value!!.email ?: "",
                             onLogout = {
@@ -36,7 +40,15 @@ class MainActivity : ComponentActivity() {
                                 currentUser.value = null
                                 authState = AuthState.LOGIN
                             },
-                            onEditDetails = { authState = AuthState.USER_DETAILS }
+                            onEditDetails = { authState = AuthState.USER_DETAILS },
+                            onChangePassword = {
+                                previousState.value = authState
+                                authState = AuthState.CHANGE_PASSWORD
+                            }
+                        )
+                        AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
+                            onPasswordChangeSuccess = { authState = AuthState.PROFILE },
+                            onBack = { authState = previousState.value ?: AuthState.PROFILE }
                         )
                         else -> {
                             ProfileScreen(
@@ -46,7 +58,11 @@ class MainActivity : ComponentActivity() {
                                     currentUser.value = null
                                     authState = AuthState.LOGIN
                                 },
-                                onEditDetails = { authState = AuthState.USER_DETAILS }
+                                onEditDetails = { authState = AuthState.USER_DETAILS },
+                                onChangePassword = {
+                                    previousState.value = authState
+                                    authState = AuthState.CHANGE_PASSWORD
+                                }
                             )
                         }
                     }
@@ -66,10 +82,13 @@ class MainActivity : ComponentActivity() {
                             },
                             onLoginClick = { authState = AuthState.LOGIN }
                         )
-                        AuthState.USER_DETAILS -> UserDetailsScreen { firstName, lastName, phoneNumber, country ->
-                            userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
-                            authState = AuthState.PROFILE
-                        }
+                        AuthState.USER_DETAILS -> UserDetailsScreen(
+                            onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
+                                userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
+                                authState = AuthState.PROFILE
+                            },
+
+                        )
                         AuthState.PROFILE -> ProfileScreen(
                             userEmail = currentUser.value!!.email ?: "",
                             onLogout = {
@@ -77,7 +96,15 @@ class MainActivity : ComponentActivity() {
                                 currentUser.value = null
                                 authState = AuthState.LOGIN
                             },
-                            onEditDetails = { authState = AuthState.USER_DETAILS }
+                            onEditDetails = { authState = AuthState.USER_DETAILS },
+                            onChangePassword = {
+                                previousState.value = authState
+                                authState = AuthState.CHANGE_PASSWORD
+                            }
+                        )
+                        AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
+                            onPasswordChangeSuccess = { authState = AuthState.PROFILE },
+                            onBack = { authState = previousState.value ?: AuthState.PROFILE }
                         )
                     }
                 }
@@ -87,7 +114,7 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class AuthState {
-    LOGIN, REGISTER, USER_DETAILS, PROFILE
+    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD
 }
 
 // Quadruple data class to hold four values

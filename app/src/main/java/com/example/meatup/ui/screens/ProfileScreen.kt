@@ -8,12 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileScreen(userEmail: String, onLogout: () -> Unit, onEditDetails: () -> Unit) {
-    val colorScheme = MaterialTheme.colorScheme
-
+fun ProfileScreen(
+    userEmail: String,
+    onLogout: () -> Unit,
+    onEditDetails: () -> Unit,
+    onChangePassword: () -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = colorScheme.background
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -22,20 +25,29 @@ fun ProfileScreen(userEmail: String, onLogout: () -> Unit, onEditDetails: () -> 
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(text = "Welcome, $userEmail", style = MaterialTheme.typography.headlineSmall)
+            Text(text = "Profile", style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onLogout,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Logout")
-            }
+            Text(text = "Email: $userEmail", style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onEditDetails,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Edit Details")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onChangePassword,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Change Password")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onLogout,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
             }
         }
     }
