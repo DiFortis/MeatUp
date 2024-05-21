@@ -59,7 +59,7 @@ fun RegisterScreen(onRegisterSuccess: (FirebaseUser) -> Unit, onLoginClick: () -
                     .padding(16.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.meat_up),
+                    painter = painterResource(id = R.drawable.ic_launcher),
                     contentDescription = "Logo",
                     modifier = Modifier.size(200.dp),
                     contentScale = ContentScale.Crop

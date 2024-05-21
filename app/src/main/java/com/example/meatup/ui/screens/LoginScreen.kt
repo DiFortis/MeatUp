@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -62,7 +61,7 @@ fun LoginScreen(onLoginSuccess: (FirebaseUser) -> Unit, onRegisterClick: () -> U
                     .padding(16.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.meat_up),
+                    painter = painterResource(id = R.drawable.ic_launcher),
                     contentDescription = "Logo",
                     modifier = Modifier.size(200.dp),
                     contentScale = ContentScale.Crop
