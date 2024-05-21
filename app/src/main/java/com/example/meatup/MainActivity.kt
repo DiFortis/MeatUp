@@ -22,7 +22,6 @@ class MainActivity : ComponentActivity() {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
                 val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
-                val previousState = remember { mutableStateOf<AuthState?>(null) }
 
                 if (currentUser.value != null) {
                     when (authState) {
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
                                 userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
                                 authState = AuthState.PROFILE
                             },
-
+                            onBack = { authState = AuthState.PROFILE }
                         )
                         AuthState.PROFILE -> ProfileScreen(
                             userEmail = currentUser.value!!.email ?: "",
@@ -41,14 +40,11 @@ class MainActivity : ComponentActivity() {
                                 authState = AuthState.LOGIN
                             },
                             onEditDetails = { authState = AuthState.USER_DETAILS },
-                            onChangePassword = {
-                                previousState.value = authState
-                                authState = AuthState.CHANGE_PASSWORD
-                            }
+                            onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
                         )
                         AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
                             onPasswordChangeSuccess = { authState = AuthState.PROFILE },
-                            onBack = { authState = previousState.value ?: AuthState.PROFILE }
+                            onBack = { authState = AuthState.PROFILE }
                         )
                         else -> {
                             ProfileScreen(
@@ -59,10 +55,7 @@ class MainActivity : ComponentActivity() {
                                     authState = AuthState.LOGIN
                                 },
                                 onEditDetails = { authState = AuthState.USER_DETAILS },
-                                onChangePassword = {
-                                    previousState.value = authState
-                                    authState = AuthState.CHANGE_PASSWORD
-                                }
+                                onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
                             )
                         }
                     }
@@ -87,7 +80,7 @@ class MainActivity : ComponentActivity() {
                                 userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
                                 authState = AuthState.PROFILE
                             },
-
+                            onBack = { authState = AuthState.LOGIN }
                         )
                         AuthState.PROFILE -> ProfileScreen(
                             userEmail = currentUser.value!!.email ?: "",
@@ -97,14 +90,12 @@ class MainActivity : ComponentActivity() {
                                 authState = AuthState.LOGIN
                             },
                             onEditDetails = { authState = AuthState.USER_DETAILS },
-                            onChangePassword = {
-                                previousState.value = authState
-                                authState = AuthState.CHANGE_PASSWORD
-                            }
+                            onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
                         )
+
                         AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
                             onPasswordChangeSuccess = { authState = AuthState.PROFILE },
-                            onBack = { authState = previousState.value ?: AuthState.PROFILE }
+                            onBack = { authState = AuthState.PROFILE }
                         )
                     }
                 }

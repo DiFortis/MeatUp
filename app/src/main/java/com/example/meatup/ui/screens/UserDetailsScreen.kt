@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Unit) {
+fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Unit, onBack: () -> Unit) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -111,7 +111,7 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Un
                             showError = true
                             errorMessage = "Please fill in all fields"
                         }
-                        firstName.any { it.isDigit() } || lastName.any {it.isDigit()} || country.any { it.isDigit() } -> {
+                        firstName.any { it.isDigit() } || lastName.any { it.isDigit() } || country.any { it.isDigit() } -> {
                             showError = true
                             errorMessage = "Names or country cannot contain numbers"
                         }
@@ -127,6 +127,13 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Un
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Submit")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Back")
             }
         }
     }
