@@ -4,11 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
+import com.example.meatup.ui.components.BottomNavigationBar
 import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -24,39 +29,49 @@ class MainActivity : ComponentActivity() {
                 val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
 
                 if (currentUser.value != null) {
-                    when (authState) {
-                        AuthState.USER_DETAILS -> UserDetailsScreen(
-                            onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
-                                userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
-                                authState = AuthState.PROFILE
-                            },
-                            onBack = { authState = AuthState.PROFILE }
-                        )
-                        AuthState.PROFILE -> ProfileScreen(
-                            userEmail = currentUser.value!!.email ?: "",
-                            onLogout = {
-                                auth.signOut()
-                                currentUser.value = null
-                                authState = AuthState.LOGIN
-                            },
-                            onEditDetails = { authState = AuthState.USER_DETAILS },
-                            onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
-                        )
-                        AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
-                            onPasswordChangeSuccess = { authState = AuthState.PROFILE },
-                            onBack = { authState = AuthState.PROFILE }
-                        )
-                        else -> {
-                            ProfileScreen(
-                                userEmail = currentUser.value!!.email ?: "",
-                                onLogout = {
-                                    auth.signOut()
-                                    currentUser.value = null
-                                    authState = AuthState.LOGIN
-                                },
-                                onEditDetails = { authState = AuthState.USER_DETAILS },
-                                onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
-                            )
+                    Scaffold(
+                        bottomBar = {
+                            BottomNavigationBar(selectedItem = authState) { selectedState ->
+                                authState = selectedState
+                            }
+                        }
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.padding(innerPadding)) {
+                            when (authState) {
+                                AuthState.USER_DETAILS -> UserDetailsScreen(
+                                    onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
+                                        userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
+                                        authState = AuthState.PROFILE
+                                    },
+                                    onBack = { authState = AuthState.PROFILE }
+                                )
+                                AuthState.PROFILE -> ProfileScreen(
+                                    userEmail = currentUser.value!!.email ?: "",
+                                    onLogout = {
+                                        auth.signOut()
+                                        currentUser.value = null
+                                        authState = AuthState.LOGIN
+                                    },
+                                    onEditDetails = { authState = AuthState.USER_DETAILS },
+                                    onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
+                                )
+                                AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
+                                    onPasswordChangeSuccess = { authState = AuthState.PROFILE },
+                                    onBack = { authState = AuthState.PROFILE }
+                                )
+                                else -> {
+                                    ProfileScreen(
+                                        userEmail = currentUser.value!!.email ?: "",
+                                        onLogout = {
+                                            auth.signOut()
+                                            currentUser.value = null
+                                            authState = AuthState.LOGIN
+                                        },
+                                        onEditDetails = { authState = AuthState.USER_DETAILS },
+                                        onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
+                                    )
+                                }
+                            }
                         }
                     }
                 } else {
