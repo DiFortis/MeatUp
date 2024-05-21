@@ -21,12 +21,12 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
-                val userDetails = remember { mutableStateOf(Pair("", "")) }
+                val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
 
                 if (currentUser.value != null) {
                     when (authState) {
-                        AuthState.USER_DETAILS -> UserDetailsScreen { firstName, lastName ->
-                            userDetails.value = Pair(firstName, lastName)
+                        AuthState.USER_DETAILS -> UserDetailsScreen { firstName, lastName, phoneNumber, country ->
+                            userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
                             authState = AuthState.PROFILE
                         }
                         AuthState.PROFILE -> ProfileScreen(
@@ -66,9 +66,19 @@ class MainActivity : ComponentActivity() {
                             },
                             onLoginClick = { authState = AuthState.LOGIN }
                         )
-
-                        AuthState.USER_DETAILS -> TODO()
-                        AuthState.PROFILE -> TODO()
+                        AuthState.USER_DETAILS -> UserDetailsScreen { firstName, lastName, phoneNumber, country ->
+                            userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
+                            authState = AuthState.PROFILE
+                        }
+                        AuthState.PROFILE -> ProfileScreen(
+                            userEmail = currentUser.value!!.email ?: "",
+                            onLogout = {
+                                auth.signOut()
+                                currentUser.value = null
+                                authState = AuthState.LOGIN
+                            },
+                            onEditDetails = { authState = AuthState.USER_DETAILS }
+                        )
                     }
                 }
             }
@@ -79,3 +89,11 @@ class MainActivity : ComponentActivity() {
 enum class AuthState {
     LOGIN, REGISTER, USER_DETAILS, PROFILE
 }
+
+// Quadruple data class to hold four values
+data class Quadruple<A, B, C, D>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D
+)
