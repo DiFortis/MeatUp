@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import com.example.meatup.ui.screens.*
-import com.example.meatup.ui.theme.MeatUpTheme
+import com.example.meatup.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
 
         setContent {
-            MeatUpTheme {
+            AppTheme {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
                 val userDetails = remember { mutableStateOf(Pair("", "")) }

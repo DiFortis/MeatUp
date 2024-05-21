@@ -9,27 +9,34 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileScreen(userEmail: String, onLogout: () -> Unit, onEditDetails: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    val colorScheme = MaterialTheme.colorScheme
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = colorScheme.background
     ) {
-        Text(text = "Welcome, $userEmail", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = onLogout,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text("Logout")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = onEditDetails,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Edit Details")
+            Text(text = "Welcome, $userEmail", style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onLogout,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onEditDetails,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Edit Details")
+            }
         }
     }
 }

@@ -18,62 +18,69 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String) -> Unit) {
     var showError by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    val colorScheme = MaterialTheme.colorScheme
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = colorScheme.background
     ) {
-        Text(text = "Enter your details", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = {
-                firstName = it
-                showError = false
-            },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
-            )
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = {
-                lastName = it
-                showError = false
-            },
-            label = { Text("Last Name") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
-            )
-        )
-        if (showError) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Please fill in all fields",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                if (firstName.isBlank() || lastName.isBlank()) {
-                    showError = true
-                } else {
-                    onDetailsSubmitted(firstName, lastName)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text("Submit")
+            Text(text = "Enter your details", style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = {
+                    firstName = it
+                    showError = false
+                },
+                label = { Text("First Name") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = {
+                    lastName = it
+                    showError = false
+                },
+                label = { Text("Last Name") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() }
+                )
+            )
+            if (showError) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Please fill in all fields",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    if (firstName.isBlank() || lastName.isBlank()) {
+                        showError = true
+                    } else {
+                        onDetailsSubmitted(firstName, lastName)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Submit")
+            }
         }
     }
 }

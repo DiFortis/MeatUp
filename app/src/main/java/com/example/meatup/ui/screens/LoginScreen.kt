@@ -1,6 +1,5 @@
 package com.example.meatup.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,7 +18,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.example.meatup.R
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -40,70 +38,77 @@ fun LoginScreen(onLoginSuccess: (FirebaseUser) -> Unit, onRegisterClick: () -> U
         }
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    val colorScheme = MaterialTheme.colorScheme
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = colorScheme.background
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.meat_up),
-            contentDescription = "Logo",
-            modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.meat_up),
+                contentDescription = "Logo",
+                modifier = Modifier.size(200.dp),
+                contentScale = ContentScale.Crop
             )
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+                )
             )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    toastMessage = "Fields cannot be empty"
-                    showToast = true
-                } else {
-                    auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                onLoginSuccess(auth.currentUser!!)
-                            } else {
-                                toastMessage = "Login failed: ${task.exception?.message}"
-                                showToast = true
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() }
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    if (email.isBlank() || password.isBlank()) {
+                        toastMessage = "Fields cannot be empty"
+                        showToast = true
+                    } else {
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    onLoginSuccess(auth.currentUser!!)
+                                } else {
+                                    toastMessage = "Login failed: ${task.exception?.message}"
+                                    showToast = true
+                                }
                             }
-                        }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Login")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(
-            onClick = onRegisterClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Go to Register")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Login")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(
+                onClick = onRegisterClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Go to Register")
+            }
         }
     }
 }
