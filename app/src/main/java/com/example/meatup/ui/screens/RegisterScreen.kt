@@ -42,7 +42,14 @@ fun RegisterScreen(onRegisterSuccess: (FirebaseUser) -> Unit, onLoginClick: () -
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
     ) { paddingValues ->
         Surface(
@@ -87,14 +94,6 @@ fun RegisterScreen(onRegisterSuccess: (FirebaseUser) -> Unit, onLoginClick: () -
                         onDone = { focusManager.clearFocus() }
                     )
                 )
-                if (showError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
@@ -106,6 +105,9 @@ fun RegisterScreen(onRegisterSuccess: (FirebaseUser) -> Unit, onLoginClick: () -
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         onRegisterSuccess(auth.currentUser!!)
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Registration successful")
+                                        }
                                     } else {
                                         showError = true
                                         errorMessage = "Registration failed: ${task.exception?.message}"

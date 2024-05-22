@@ -40,7 +40,14 @@ fun ChangePasswordScreen(onPasswordChangeSuccess: () -> Unit, onBack: () -> Unit
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
     ) { paddingValues ->
         Surface(

@@ -3,17 +3,21 @@ package com.example.meatup
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.example.meatup.ui.components.BottomNavigationBar
 import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -27,9 +31,21 @@ class MainActivity : ComponentActivity() {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
                 val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
+                val snackbarHostState = remember { SnackbarHostState() }
+                var showPasswordChangedSnackbar by remember { mutableStateOf(false) }
 
                 if (currentUser.value != null) {
                     Scaffold(
+                        snackbarHost = {
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                SnackbarHost(
+                                    hostState = snackbarHostState,
+                                    modifier = Modifier.align(Alignment.TopCenter)
+                                )
+                            }
+                        },
                         bottomBar = {
                             BottomNavigationBar(selectedItem = authState) { selectedState ->
                                 authState = selectedState
@@ -53,10 +69,14 @@ class MainActivity : ComponentActivity() {
                                         authState = AuthState.LOGIN
                                     },
                                     onEditDetails = { authState = AuthState.USER_DETAILS },
-                                    onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
+                                    onChangePassword = { authState = AuthState.CHANGE_PASSWORD },
+                                    showPasswordChangedSnackbar = showPasswordChangedSnackbar
                                 )
                                 AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
-                                    onPasswordChangeSuccess = { authState = AuthState.PROFILE },
+                                    onPasswordChangeSuccess = {
+                                        authState = AuthState.PROFILE
+                                        showPasswordChangedSnackbar = true
+                                    },
                                     onBack = { authState = AuthState.PROFILE }
                                 )
                                 else -> {
@@ -68,7 +88,8 @@ class MainActivity : ComponentActivity() {
                                             authState = AuthState.LOGIN
                                         },
                                         onEditDetails = { authState = AuthState.USER_DETAILS },
-                                        onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
+                                        onChangePassword = { authState = AuthState.CHANGE_PASSWORD },
+                                        showPasswordChangedSnackbar = showPasswordChangedSnackbar
                                     )
                                 }
                             }
@@ -105,11 +126,15 @@ class MainActivity : ComponentActivity() {
                                 authState = AuthState.LOGIN
                             },
                             onEditDetails = { authState = AuthState.USER_DETAILS },
-                            onChangePassword = { authState = AuthState.CHANGE_PASSWORD }
+                            onChangePassword = { authState = AuthState.CHANGE_PASSWORD },
+                            showPasswordChangedSnackbar = showPasswordChangedSnackbar
                         )
 
                         AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
-                            onPasswordChangeSuccess = { authState = AuthState.PROFILE },
+                            onPasswordChangeSuccess = {
+                                authState = AuthState.PROFILE
+                                showPasswordChangedSnackbar = true
+                            },
                             onBack = { authState = AuthState.PROFILE }
                         )
                     }
