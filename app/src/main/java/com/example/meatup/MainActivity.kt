@@ -1,30 +1,44 @@
 package com.example.meatup
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import com.example.meatup.ui.components.BottomNavigationBar
+import com.example.meatup.ui.components.MeatShopsMap
 import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.AppTheme
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import org.osmdroid.config.Configuration
+import org.osmdroid.library.BuildConfig
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var userLocation by mutableStateOf<Location?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
         setContent {
             AppTheme {
@@ -33,6 +47,17 @@ class MainActivity : ComponentActivity() {
                 val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
                 val snackbarHostState = remember { SnackbarHostState() }
                 var showPasswordChangedSnackbar by remember { mutableStateOf(false) }
+                LocalContext.current
+
+                val locationPermissionRequest = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestMultiplePermissions()
+                ) { permissions ->
+                    val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                    if (granted) {
+                        getUserLocation()
+                    }
+                }
 
                 if (currentUser.value != null) {
                     Scaffold(
@@ -47,8 +72,16 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         bottomBar = {
-                            BottomNavigationBar(selectedItem = authState) { selectedState ->
+                            BottomNavigationBar(selectedItem = authState) { selectedState, requiresLocation ->
                                 authState = selectedState
+                                if (requiresLocation && userLocation == null) {
+                                    locationPermissionRequest.launch(
+                                        arrayOf(
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION
+                                        )
+                                    )
+                                }
                             }
                         }
                     ) { innerPadding ->
@@ -79,6 +112,13 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onBack = { authState = AuthState.PROFILE }
                                 )
+                                AuthState.NEAREST_MEAT_SHOPS -> {
+                                    if (userLocation != null) {
+                                        MeatShopsMap(userLocation!!)
+                                    } else {
+                                        Text("Fetching location...")
+                                    }
+                                }
                                 else -> {
                                     ProfileScreen(
                                         userEmail = currentUser.value!!.email ?: "",
@@ -129,7 +169,13 @@ class MainActivity : ComponentActivity() {
                             onChangePassword = { authState = AuthState.CHANGE_PASSWORD },
                             showPasswordChangedSnackbar = showPasswordChangedSnackbar
                         )
-
+                        AuthState.NEAREST_MEAT_SHOPS -> {
+                            if (userLocation != null) {
+                                MeatShopsMap(userLocation!!)
+                            } else {
+                                Text("Fetching location...")
+                            }
+                        }
                         AuthState.CHANGE_PASSWORD -> ChangePasswordScreen(
                             onPasswordChangeSuccess = {
                                 authState = AuthState.PROFILE
@@ -142,10 +188,19 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                userLocation = location
+            }
+        }
+    }
 }
 
 enum class AuthState {
-    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD
+    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD, NEAREST_MEAT_SHOPS
 }
 
 // Quadruple data class to hold four values
