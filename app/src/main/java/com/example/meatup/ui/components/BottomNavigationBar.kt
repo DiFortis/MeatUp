@@ -16,7 +16,8 @@ fun BottomNavigationBar(selectedItem: AuthState, onItemSelected: (AuthState, Boo
         NavItem("Profile", Icons.Default.Person, AuthState.PROFILE),
         NavItem("Details", Icons.Default.Info, AuthState.USER_DETAILS),
         NavItem("Password", Icons.Default.Lock, AuthState.CHANGE_PASSWORD),
-        NavItem("Meat Shops", Icons.Default.ShoppingCart, AuthState.NEAREST_MEAT_SHOPS)
+        NavItem("Meat Shops", Icons.Default.ShoppingCart, AuthState.NEAREST_MEAT_SHOPS),
+        NavItem("Sausage", Icons.Default.Notifications, AuthState.SAUSAGE_ANIMATION)
     )
 
     NavigationBar {

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import com.example.meatup.ui.components.BottomNavigationBar
 import com.example.meatup.ui.components.MeatShopsMap
+import com.example.meatup.ui.screens.SausageScreen
 import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.AppTheme
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -119,6 +120,7 @@ class MainActivity : ComponentActivity() {
                                         Text("Fetching location...")
                                     }
                                 }
+                                AuthState.SAUSAGE_ANIMATION -> SausageScreen()
                                 else -> {
                                     ProfileScreen(
                                         userEmail = currentUser.value!!.email ?: "",
@@ -183,6 +185,8 @@ class MainActivity : ComponentActivity() {
                             },
                             onBack = { authState = AuthState.PROFILE }
                         )
+
+                        AuthState.SAUSAGE_ANIMATION -> TODO()
                     }
                 }
             }
@@ -200,7 +204,7 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class AuthState {
-    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD, NEAREST_MEAT_SHOPS
+    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD, NEAREST_MEAT_SHOPS, SAUSAGE_ANIMATION
 }
 
 // Quadruple data class to hold four values
