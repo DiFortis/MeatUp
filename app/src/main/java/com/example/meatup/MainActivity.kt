@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import com.example.meatup.ui.components.BottomNavigationBar
 import com.example.meatup.ui.components.MeatShopsMap
-import com.example.meatup.ui.screens.SausageScreen
 import com.example.meatup.ui.screens.*
 import com.example.meatup.ui.theme.AppTheme
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -45,7 +44,6 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 var authState by remember { mutableStateOf(AuthState.LOGIN) }
                 val currentUser = remember { mutableStateOf(auth.currentUser) }
-                val userDetails = remember { mutableStateOf(Quadruple("", "", "", "")) }
                 val snackbarHostState = remember { SnackbarHostState() }
                 var showPasswordChangedSnackbar by remember { mutableStateOf(false) }
                 LocalContext.current
@@ -90,7 +88,6 @@ class MainActivity : ComponentActivity() {
                             when (authState) {
                                 AuthState.USER_DETAILS -> UserDetailsScreen(
                                     onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
-                                        userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
                                         authState = AuthState.PROFILE
                                     },
                                     onBack = { authState = AuthState.PROFILE }
@@ -121,6 +118,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 AuthState.SAUSAGE_ANIMATION -> SausageScreen()
+                                AuthState.BARCODE_SCANNER -> BarcodeScannerScreen(onScanComplete = { authState = AuthState.BARCODE_LIST })
+                                AuthState.BARCODE_LIST -> BarcodeListScreen()
                                 else -> {
                                     ProfileScreen(
                                         userEmail = currentUser.value!!.email ?: "",
@@ -155,7 +154,6 @@ class MainActivity : ComponentActivity() {
                         )
                         AuthState.USER_DETAILS -> UserDetailsScreen(
                             onDetailsSubmitted = { firstName, lastName, phoneNumber, country ->
-                                userDetails.value = Quadruple(firstName, lastName, phoneNumber, country)
                                 authState = AuthState.PROFILE
                             },
                             onBack = { authState = AuthState.LOGIN }
@@ -185,8 +183,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onBack = { authState = AuthState.PROFILE }
                         )
-
                         AuthState.SAUSAGE_ANIMATION -> TODO()
+                        AuthState.BARCODE_SCANNER -> BarcodeScannerScreen(onScanComplete = { authState = AuthState.BARCODE_LIST })
+                        AuthState.BARCODE_LIST -> BarcodeListScreen()
                     }
                 }
             }
@@ -204,13 +203,5 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class AuthState {
-    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD, NEAREST_MEAT_SHOPS, SAUSAGE_ANIMATION
+    LOGIN, REGISTER, USER_DETAILS, PROFILE, CHANGE_PASSWORD, NEAREST_MEAT_SHOPS, SAUSAGE_ANIMATION, BARCODE_SCANNER, BARCODE_LIST
 }
-
-// Quadruple data class to hold four values
-data class Quadruple<A, B, C, D>(
-    val first: A,
-    val second: B,
-    val third: C,
-    val fourth: D
-)

@@ -11,6 +11,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,6 +26,28 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Un
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    val db = FirebaseFirestore.getInstance()
+    val auth = FirebaseAuth.getInstance()
+
+    // Fetch existing user details
+    LaunchedEffect(Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val userDocRef = db.collection("users").document(currentUser.uid)
+            userDocRef.get().addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    firstName = document.getString("firstName") ?: ""
+                    lastName = document.getString("lastName") ?: ""
+                    phoneNumber = document.getString("phoneNumber") ?: ""
+                    country = document.getString("country") ?: ""
+                }
+            }.addOnFailureListener { e ->
+                showError = true
+                errorMessage = "Error fetching details: ${e.message}"
+            }
+        }
+    }
 
     LaunchedEffect(showError) {
         if (showError) {
@@ -59,7 +83,7 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Un
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(text = "Enter your details", style = MaterialTheme.typography.headlineSmall)
+                Text(text = "Change your details", style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = firstName,
@@ -136,7 +160,26 @@ fun UserDetailsScreen(onDetailsSubmitted: (String, String, String, String) -> Un
                                 errorMessage = "Phone number can only contain digits"
                             }
                             else -> {
-                                onDetailsSubmitted(firstName, lastName, phoneNumber, country)
+                                val currentUser = auth.currentUser
+                                if (currentUser != null) {
+                                    val userDetails = mapOf(
+                                        "firstName" to firstName,
+                                        "lastName" to lastName,
+                                        "phoneNumber" to phoneNumber,
+                                        "country" to country
+                                    )
+                                    db.collection("users").document(currentUser.uid).set(userDetails)
+                                        .addOnSuccessListener {
+                                            onDetailsSubmitted(firstName, lastName, phoneNumber, country)
+                                        }
+                                        .addOnFailureListener { e ->
+                                            showError = true
+                                            errorMessage = "Error saving details: ${e.message}"
+                                        }
+                                } else {
+                                    showError = true
+                                    errorMessage = "User not logged in"
+                                }
                             }
                         }
                     },

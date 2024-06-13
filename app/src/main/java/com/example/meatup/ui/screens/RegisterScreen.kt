@@ -72,6 +72,7 @@ fun RegisterScreen(onRegisterSuccess: (FirebaseUser) -> Unit, onLoginClick: () -
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Register", style = MaterialTheme.typography.headlineMedium)
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },

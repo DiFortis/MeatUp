@@ -65,6 +65,7 @@ fun LoginScreen(onLoginSuccess: (FirebaseUser) -> Unit, onRegisterClick: () -> U
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.height(16.dp))
+                        Text(text = "Log in", style = MaterialTheme.typography.headlineMedium)
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it },

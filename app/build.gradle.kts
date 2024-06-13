@@ -51,8 +51,7 @@ android {
 }
 
 dependencies {
-
-   implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,10 +61,19 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.osmdroid.android)
     implementation(libs.osmdroid.wms)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.google.common)
+    implementation(libs.fuel)
+    implementation("io.coil-kt:coil-compose:2.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
